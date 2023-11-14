@@ -1,0 +1,18 @@
+---
+title: "HW5, P1805"
+author: "Aleya Khalifa"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 0
+
+# Problem 1
+
+# Problem 2
+
+# Problem 3
