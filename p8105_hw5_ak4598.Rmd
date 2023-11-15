@@ -14,15 +14,13 @@ library(tidyverse)
 
 ## Problem 2.1 Create a tidy dataframe
 
-Create a tidy dataframe containing data from all participants, including the subject ID, arm, and observations over time.
-
 Create a dataframe containing all file names.
 
 ```{r}
 filenames <- list.files(path = "data/")
 ```
 
-Iterate over file names and read in data for each subject using `purrr::map` and saving the result as a new variable in the dataframe.
+Iterate over file names and read in data for each subject using `purrr::map` and save the result as a new variable.
 
 ```{r, message = FALSE}
 df <- purrr::map(filenames, ~read_csv(file.path("data/", .))) %>%
@@ -30,7 +28,7 @@ df <- purrr::map(filenames, ~read_csv(file.path("data/", .))) %>%
   rowid_to_column()
 ```
 
-Tidy the result; manipulate file names to include control arm and subject ID, make sure weekly observations are “tidy”, and do any other tidying that’s necessary. This includes creating a long format dataset so that values can be plotted over time in the following plot.
+Tidy the results to include control arm and subject ID. Create a long format dataset so that values can be plotted over time in the following plot.
 
 ```{r}
 df <- df %>%
@@ -50,7 +48,7 @@ df <- df %>%
 
 ## Problem 2.2 Plot
 
-Make a spaghetti plot showing observations on each subject over time, and comment on differences between groups.
+Make a spaghetti plot showing observations on each subject over time.
 
 ```{r plot_2_2, message = FALSE, warning = FALSE}
 ggplot(df, aes(x = week, y = values, group = id)) + 
@@ -63,12 +61,11 @@ ggplot(df, aes(x = week, y = values, group = id)) +
   ylab("Value")
 ```
 
+Individuals in the experimental arm were more likely to have increases in their value over time. Individuals in the control arm stayed roughly the same.
 
 # Problem 3
 
-When designing an experiment or analysis, a common question is whether it is likely that a true effect will be detected – put differently, whether a false null hypothesis will be rejected. The probability that a false null hypothesis is rejected is referred to as power, and it depends on several factors, including: the sample size; the effect size; and the error variance. In this problem, I will simulate data to explore power in a one-sample t-test.
-
-Before beginning, set the seed so results are reproducible. 
+In this problem, I will simulate data to explore power in a one-sample t-test. Before beginning, I set the seed so results are reproducible. 
 
 ```{r}
 set.seed(1)
@@ -172,13 +169,13 @@ sim_results %>%
   ggplot(aes(x = mean_df, y = avg_estimate)) + 
   geom_line(linewidth = 1.5, alpha = 0.8) + 
   geom_line(data = avg_rejected, color = "red", linewidth = 1.5, alpha = 0.8) + 
-  labs(title = "Average mean estimate by the true mean",
-       x = "True mean value",
-       y = "Average mean estimate",
+  labs(title = "Sample vs. population mean",
+       x = "Population mean",
+       y = "Sample mean",
        caption = "Red line = samples in which null hypothesis was rejected") + 
   scale_x_continuous(breaks = seq(0, 6, 1)) + 
   scale_y_continuous(breaks = seq(0, 6, 1)) + 
   theme_bw()
 ```
 
-Across all samples, the sample average of the mean estimates is equal to the true mean value. However, among samples where the null hypothesis was rejected, those samples with true means between 0 and 4 do not have sample averages equal to the truth. These are most different around the true population mean  of 1, at which mean the `rnorm` function may be more likely to create samples with an average estimate of about 2.
+Across all samples, the sample average of the mean estimates is equal to the true mean value. However, among samples where the null hypothesis was rejected, those samples with true means between 0 and 4 do not have sample averages equal to the truth. These are most different around the true population mean  of 1, at which mean the `rnorm` function may be more likely to create samples with an average estimate of about 2. This may be due to the small effect size, since the sample and population means were more similar at higher values of the mean.
