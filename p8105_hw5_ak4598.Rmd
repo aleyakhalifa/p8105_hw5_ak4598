@@ -148,7 +148,7 @@ sim_results %>%
     reject_prop = reject_h0/5000*100) %>%
   ggplot(aes(x = mean_df, y = reject_prop)) + 
   geom_line(linewidth = 1) + 
-  labs(title = str_wrap("Proportion of times the null hypothesis was rejected dependent on the true mean"),
+  labs(title = "Proportion of times the null was rejected",
        x = "True mean value",
        y = "Proportion (%)") + 
   scale_x_continuous(breaks = seq(0, 6, 1)) + 
@@ -158,9 +158,27 @@ sim_results %>%
  
 ## Problem 3.3 Plot
 
-Make a plot showing the average estimate of μ̂ on the y axis and the true value of μ on the x axis. Make a second plot (or overlay on the first) the average estimate of μ̂ only in samples for which the null was rejected on the y axis and the true value of μ on the x axis. Is the sample average of μ̂ across tests for which the null is rejected approximately equal to the true value of μ? Why or why not?
+This plot shows the average estimate of μ̂ on the y axis and the true value of μ on the x axis, for all samples and in red, just the samples in which the null hypothesis was rejected. 
 
-```{r plot_3_3}
+```{r plot 3_3}
+avg_rejected <- sim_results %>%
+  filter(p.value < 0.05) %>%
+  group_by(mean_df) %>%
+  summarize(avg_estimate = mean(estimate))
 
+sim_results %>%
+  group_by(mean_df) %>%
+  summarize(avg_estimate = mean(estimate)) %>%
+  ggplot(aes(x = mean_df, y = avg_estimate)) + 
+  geom_line(linewidth = 1.5, alpha = 0.8) + 
+  geom_line(data = avg_rejected, color = "red", linewidth = 1.5, alpha = 0.8) + 
+  labs(title = "Average mean estimate by the true mean",
+       x = "True mean value",
+       y = "Average mean estimate",
+       caption = "Red line = samples in which null hypothesis was rejected") + 
+  scale_x_continuous(breaks = seq(0, 6, 1)) + 
+  scale_y_continuous(breaks = seq(0, 6, 1)) + 
+  theme_bw()
 ```
 
+Across all samples, the sample average of the mean estimates is equal to the true mean value. However, among samples where the null hypothesis was rejected, those samples with true means between 0 and 4 do not have sample averages equal to the truth. These are most different around the true population mean  of 1, at which mean the `rnorm` function may be more likely to create samples with an average estimate of about 2.
